@@ -1,0 +1,15 @@
+# Reflection offset:
+point_z_height = (z_height ** 2 - distance_to_edge ** 2) ** 0.5
+slope_gradient = 0.5 * math.pi - math.atan(distance_to_edge / point_z_height)
+offset = math.tan(slope_gradient) * point_z_height
+
+# Distance to edge (in rounded rectangle)
+if (point[0] < rect_radius or point[0] > (rect_size[0] - rect_radius)) and (point[1] < rect_radius or point[1] > (rect_size[1] - rect_radius)):
+    if distance_x_handleedge != 0:
+        distance_y = (rect_radius ** 2 - (rect_radius - distance_x_handleedge) ** 2) ** 0.5 - (rect_radius - distance_y_handleedge)
+    else:
+        distance_y = 0
+    if distance_y_handleedge != 0:
+        distance_x = (rect_radius ** 2 - (rect_radius - distance_y_handleedge) ** 2) ** 0.5 - (rect_radius - distance_x_handleedge)
+    else:
+        distance_x = 0
