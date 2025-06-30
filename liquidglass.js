@@ -9,7 +9,7 @@ function get_between(value, min, max) {
 }
 
 // This function calculates the offset of the pixel after deflection, base on its distance to edge
-async function calc_pixel_refraction_offset(z_height, v_height, distance_point_edge, distance_center_edge) {
+async function calc_pixel_refraction_offset(z_height, distance_point_edge, total_length) {
     if (distance_point_edge >= z_height) {
         // If the pixel is within the central region so not reflected
         return 0;
@@ -19,11 +19,7 @@ async function calc_pixel_refraction_offset(z_height, v_height, distance_point_e
         // If already calculated and found in cache
         offset = refraction_offset_cache[distance_point_edge.toString()];
     } else {
-        const point_z_height = (z_height ** 2 - distance_point_edge ** 2) ** 0.5; // calculate the z-height of the surface at the pixel
-        const slope_gradient = Math.atan((2 * z_height  - 2 * distance_point_edge) - 0.5 * ((z_height ** 2 - distance_point_edge ** 2) ** 0.5));
-        const refracted_gradient = Math.atan((v_height + z_height - point_z_height) / (distance_center_edge - distance_point_edge));
-        const angle_incident = Math.asin(1.5 * Math.sin(0.5 * Math.pi - (refracted_gradient - slope_gradient)));
-        offset = Math.tan(slope_gradient) * point_z_height;
+        offset = (total_length / distance_point_edge) - ((total_length / z_height) - 1);
         refraction_offset_cache[distance_point_edge.toString()] = offset;
     }
     return offset;
@@ -31,14 +27,14 @@ async function calc_pixel_refraction_offset(z_height, v_height, distance_point_e
 
 // This function calculates both x and y offset of a pixel
 // (does calc_pixel_refraction_offset twice on both x and y direction, and calcs the diffusing effect)
-async function calc_pixel_xy_offset(rect_w, rect_h, z_height, v_height, point_x, point_y) {
+async function calc_pixel_xy_offset(rect_w, rect_h, z_height, point_x, point_y) {
     // For x-offset
-    var x_offset = await calc_pixel_refraction_offset(z_height, v_height, Math.min(point_x, rect_w - point_x), (rect_w / 2));
+    var x_offset = await calc_pixel_refraction_offset(z_height, Math.min(point_x, rect_w - point_x), rect_w);
     // For y-offset
-    var y_offset = await calc_pixel_refraction_offset(z_height, v_height, Math.min(point_y, rect_h - point_y), (rect_h / 2));
+    var y_offset = await calc_pixel_refraction_offset(z_height, Math.min(point_y, rect_h - point_y), rect_h);
     // Adjust and return result
-    x_offset = get_between(Math.round(x_offset), 0, (rect_w - point_x));
-    y_offset = get_between(Math.round(y_offset), 0, (rect_h - point_y));
+    x_offset = get_between(Math.round(x_offset), -(rect_w - point_x - 1), (rect_w - point_x - 1));
+    y_offset = get_between(Math.round(y_offset), -(rect_h - point_y - 1), (rect_h - point_y - 1));
     if (point_x > z_height) {
         x_offset = -x_offset;
     }
