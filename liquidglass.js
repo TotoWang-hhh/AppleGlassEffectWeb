@@ -28,19 +28,23 @@ async function calc_pixel_refraction_offset(z_height, distance_point_edge, total
 }
 
 // This function calculates the edge diffusing effect offset with a given value of distance to center
-async function calc_pixel_edge_diffusion_offset_abs(z_height, max_diffuse, distance_point_edge) {
+async function calc_pixel_edge_diffusion_offset_abs(z_height, diffuse_level, distance_point_center, distance_point_edge) {
     if (distance_point_edge > z_height) {
         return 0;
     }
-    var offset = max_diffuse * ((1 - (distance_point_edge / z_height)) ** 2);
+    // const offset_target = Math.ceil(distance_point_center / (z_height - distance_point_edge + 1) ** diffuse_level);
+    // const offset = distance_point_center - offset_target;
+    const offset = 0;
+    // console.log(`${distance_point_center} ==> ${(z_height - distance_point_edge + 1) ** diffuse_level}  ${offset_target}  ${offset}`);
     return offset;
 }
 
 // This function decides the direction of edge diffusion offset
-async function calc_pixel_edge_diffusion_offset(z_height, max_diffuse, point_pos, total_length) {
+async function calc_pixel_edge_diffusion_offset(z_height, max_diffuse, point_pos, total_length, 
+    perpendicular_point_pos, perpendicular_total_length) {
     var diffuse_offset = await calc_pixel_edge_diffusion_offset_abs(z_height, max_diffuse, 
-        Math.min(point_pos, total_length - point_pos), total_length);
-    if (point_pos > total_length - point_pos) {
+        Math.abs(total_length / 2 - point_pos), Math.min(perpendicular_point_pos, perpendicular_total_length - perpendicular_point_pos));
+    if (perpendicular_point_pos < perpendicular_total_length / 2) {
         diffuse_offset = -diffuse_offset;
     }
     // console.log(`${point_pos} ==> ${diffuse_offset}`);
@@ -52,10 +56,10 @@ async function calc_pixel_edge_diffusion_offset(z_height, max_diffuse, point_pos
 async function calc_pixel_xy_offset(rect_w, rect_h, z_height, max_edge_diffuse, point_x, point_y) {
     // For x-offset
     var x_offset = await calc_pixel_refraction_offset(z_height, Math.min(point_x, rect_w - point_x), rect_w);
-    x_offset += await calc_pixel_edge_diffusion_offset(z_height, max_edge_diffuse, point_y, rect_h);
+    // x_offset += await calc_pixel_edge_diffusion_offset(z_height, max_edge_diffuse, point_y, rect_h,  point_x, rect_w);
     // For y-offset
     var y_offset = await calc_pixel_refraction_offset(z_height, Math.min(point_y, rect_h - point_y), rect_h);
-    y_offset += await calc_pixel_edge_diffusion_offset(z_height, max_edge_diffuse, point_x, rect_w);
+    // y_offset += await calc_pixel_edge_diffusion_offset(z_height, max_edge_diffuse, point_x, rect_w, point_y, rect_h);
     // Adjust and return result
     if (point_x > z_height) {
         x_offset = -x_offset;

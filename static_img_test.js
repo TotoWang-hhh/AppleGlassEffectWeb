@@ -33,8 +33,8 @@ function load_bg_and_render() {
     const img = new Image();
     img.src = './Test_BG3.jpg';
     img.onload = function() {
-        target_canvas.width = Math.round(img.width / 4);
-        target_canvas.height = Math.round(img.height / 4);
+        target_canvas.width = Math.round(img.width / 2);
+        target_canvas.height = Math.round(img.height / 2);
         ctx.drawImage(img, 0, 0, target_canvas.width, target_canvas.height);
         const originalImageDataRaw = ctx.getImageData(0, 0, target_canvas.width, target_canvas.height);
         store_original_image_data(originalImageDataRaw);
@@ -54,7 +54,7 @@ function draw_pixel(pos_x, pos_y, r, g, b, a = 255) {
 }
 
 function get_pixel(pos_x, pos_y) {
-    if (pos_x < 0 | pos_x > target_canvas.width | pos_y < 0 | pos_y > target_canvas.height) {
+    if (pos_x < 0 | pos_x > target_canvas.width-1 | pos_y < 0 | pos_y > target_canvas.height-1) {
         return [100, 0, 255, 0];
     }
     const color = originalImageData[pos_y][pos_x];
@@ -62,7 +62,7 @@ function get_pixel(pos_x, pos_y) {
 }
 
 async function render_pixel(x, y, width, height) {
-    var [offset_x, offset_y] = await calc_pixel_xy_offset(width, height, 30, 50, x, y);
+    var [offset_x, offset_y] = await calc_pixel_xy_offset(width, height, 70, 2, x, y);
     var [rr, rg, rb, ra] = get_pixel(x + offset_x, y + offset_y);
     draw_pixel(x, y, rr, rg, rb);
     // if (y > target_canvas.height - 30 | y < 30) {
