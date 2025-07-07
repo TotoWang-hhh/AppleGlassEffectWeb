@@ -1,3 +1,25 @@
+///////////////////////////////////////////////////////
+//                                                   //
+//   #       #####   ####    #    #  #####  ####     //
+//   #         #    #    #   #    #    #    #   #    //
+//   #         #    #    #   #    #    #    #    #   //
+//   #         #    #  # #   #    #    #    #   #    //
+//   ######  #####   ### ##   ####   #####  ####     //
+//                                                   //
+//       #####  #         ##     ####    ####        //
+//      #       #        #  #   #       #            //
+//      #  ###  #       ######   ####    ####        //
+//      #    #  #       #    #       #       #       //
+//       #####  ######  #    #  #####   #####        //
+//                                                   //
+//           2025 by rgzz666 (Wang Sizhe)            //
+//                                                   //
+///////////////////////////////////////////////////////
+
+// Here are the debug options //
+const ASSUME_WEBGPU_NOT_AVAIL = true;
+// That's it! Below are the codes. //
+
 var refraction_offset_cache = {};
 
 // This function adjusts a value into a given range
@@ -70,4 +92,44 @@ async function calc_pixel_xy_offset(rect_w, rect_h, z_height, max_edge_diffuse, 
     x_offset = get_between(Math.round(x_offset), -(point_x - 1), (rect_w - point_x - 1));
     y_offset = get_between(Math.round(y_offset), -(point_y - 1), (rect_h - point_y - 1));
     return [x_offset, y_offset];
+}
+
+// This function draws an image for feDisplacementMap
+async function draw_displacement_map(width, height, xChanel="R", yChanel="B") {
+    if (width === undefined | height === undefined) {
+        console.error("Parameters for draw_displacement_map() are not present! \n" + 
+                      "The displacement map drawing task will be ended.");
+        return;
+    }
+    const colorChanels = ["R", "G", "B", "A"];
+    console.log("Redraw displacement map.");
+    const offscreen = new OffscreenCanvas(width, height);
+    const ctx = offscreen.getContext('2d');
+    function draw_pixel(pos_x, pos_y, r, g, b, a = 255) {
+        const imgData = ctx.getImageData(pos_x, pos_y, 1, 1);
+        imgData.data[0] = r;
+        imgData.data[1] = g;
+        imgData.data[2] = b;
+        imgData.data[3] = a;
+        ctx.putImageData(imgData, pos_x, pos_y);
+    }
+    if (navigator.gpu & !ASSUME_WEBGPU_NOT_AVAIL) {
+        console.log("WebGPU available!");
+    } else {
+        console.warn("WebGPU not present! Falling back to CPU rendering, which may be slow. \n" + 
+                     "Consider to keep your browser up date or check debug options.");
+        if (ASSUME_WEBGPU_NOT_AVAIL) {
+            console.log("%cTip " + 
+                        "%cWebGPU is assumed to be unavailable according to debug options. \n" + 
+                        "Consider changing it in liquidglass.js if necessary.", 
+                        "padding: 2px 5px; border-radius: 3px; color: #fff; background: green; font-weight: bold;", 
+                        "color: green")
+        }
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                a = 1;
+                //NotImplemented
+            }
+        }
+    }
 }
