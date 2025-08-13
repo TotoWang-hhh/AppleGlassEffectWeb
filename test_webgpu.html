@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebGPU Displacement Map Example</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    .background {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      background: url('./Test_BG3.jpg') no-repeat center center;
+      background-size: cover;
+    }
+    #gpu-canvas {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      pointer-events: none;
+    }
+    #glass {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      cursor: move;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+  <canvas id="gpu-canvas"></canvas>
+  <div id="glass"></div>
+
+  <script href="./displacement.js"></script>
+  <script href="./liquidglass"></script>
+
+  <script>
+    // import initDisplacement from './displacement.js';
+    // import { draw_displacement_map } from './liquidglass.js';
+
+    const glass = document.getElementById('glass');
+    const canvas = document.getElementById('gpu-canvas');
+    canvas.width = 150;
+    canvas.height = 150;
+
+    // Position glass and canvas
+    let offsetX = 0, offsetY = 0;
+    glass.style.left = '100px';
+    glass.style.top = '100px';
+    canvas.style.left = '100px';
+    canvas.style.top = '100px';
+
+    glass.addEventListener('mousedown', e => {
+        const rect = glass.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        function move(ev) {
+            const left = ev.clientX - offsetX;
+            const top = ev.clientY - offsetY;
+            // moveCanvas(left, top);
+            glass.style.left = left;
+            glass.style.top = top;
+        }
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', () => {
+            window.removeEventListener('mousemove', move);
+        }, { once: true });
+    });
+
+
+  </script>
+</body>
+</html>

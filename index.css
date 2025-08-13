@@ -1,0 +1,40 @@
+body {
+  margin: 2em;
+  font-family: "DM Sans", sans-serif, sans-serif;
+  background-color: #f0f0f5;
+  color: #222;
+  user-select: none;
+}
+
+h1 {
+  margin-bottom: 1.5em;
+  font-weight: 700;
+}
+
+.glass-block {
+  position: absolute;
+  top: 150px;
+  left: 150px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255 255 255 / 0.3);
+  border: 1.5px solid rgba(255 255 255 / 0.7);
+  backdrop-filter: url(#glassFilter);
+  /* no border-radius for straight corners */
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.1),
+    inset 0 0 10px rgba(255, 255, 255, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+  cursor: grab;
+  transition: box-shadow 0.3s ease;
+}
+
+.glass-block:active {
+  cursor: grabbing;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.2),
+    inset 0 0 15px rgba(255, 255, 255, 0.6);
+}
